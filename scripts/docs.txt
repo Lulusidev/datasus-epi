@@ -1,0 +1,17 @@
+maformacoes-python/
+├── pyproject.toml
+├── src/
+│   └── sinasc/
+│       ├── __init__.py
+│       ├── io.py            # download, parquet, abertura
+│       ├── tempo.py         # padronização temporal
+│       ├── derivacoes.py    # variáveis derivadas
+│       ├── indicadores.py   # CID, caso, flags
+│       ├── taxas.py         # agregações e taxas
+│       ├── dicionarios.py   # UF, rótulos, mapas
+│       └── config.py        # paths, constantes
+├── scripts/
+│   └── main.py
+└── data/
+    ├── dbc/
+    └── parquet/
