@@ -9,8 +9,17 @@ def obter_taxa_sinasc(
     cid: str | None = None,
     tempo: str = "ano",
     estratos: list[str] | None = None,
-    k: int = 100_000
-) -> pl.DataFrame:
+    k: int = 100_000,
+    retorno: str = "pandas"
+):
+    """
+    Parâmetros
+    ----------
+    retorno :
+        - 'pandas'    -> pandas.DataFrame
+        - 'geopandas' -> geopandas.GeoDataFrame (se houver coluna geometry)
+        - 'polars'    -> polars.DataFrame
+    """
 
     if estratos is None:
         estratos = []
@@ -20,15 +29,14 @@ def obter_taxa_sinasc(
 
     group_cols = [tempo] + estratos
 
-    df = (
+
+    # Pipeline principal
+
+    lf = (
         abrir_sinasc(anos)
         .pipe(padronizar_tempo)
         .pipe(derivar_variaveis)
         .pipe(indicador_malformacao, cid)
-    )
-
-    return (
-        df
         .group_by(group_cols)
         .agg([
             pl.len().alias("n_nascidos_vivos"),
@@ -39,5 +47,31 @@ def obter_taxa_sinasc(
             .alias(f"taxa_por_{k}")
         )
         .sort(group_cols)
-        .collect()
     )
+
+    df = lf.collect()
+
+    if retorno == "polars":
+        return df
+
+    elif retorno == "pandas":
+        return df.to_pandas()
+
+    elif retorno == "geopandas":
+        import geopandas as gpd
+
+        if "geometry" not in df.columns:
+            raise ValueError(
+                "retorno='geopandas' exige coluna 'geometry'"
+            )
+
+        return gpd.GeoDataFrame(
+            df.to_pandas(),
+            geometry="geometry",
+            crs="EPSG:4674"
+        )
+
+    else:
+        raise ValueError(
+            "retorno inválido. Use: 'polars', 'pandas' ou 'geopandas'"
+        )

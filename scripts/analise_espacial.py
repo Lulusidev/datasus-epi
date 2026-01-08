@@ -2,6 +2,7 @@ import libpysal
 import numpy as np
 from esda.moran import Moran
 from esda.moran import Moran_Local
+from esda.smoothing import Empirical_Bayes
 
 def criar_matriz_vizinhanca(
     gdf,
@@ -43,8 +44,6 @@ def moran_global(
         "p_value": mi.p_sim
     }
 
-
-
 def lisa_local(
     valores: np.ndarray,
     w
@@ -61,24 +60,23 @@ def lisa_local(
         "quadrant": lisa.q
     }
 
-from esda.smoothing import Empirical_Bayes
-
-def suavizar_empirical_bayes(
+def suavizar_taxa_empirical_bayes(
     gdf,
     casos: str,
     populacao: str,
-    nome_saida: str = "taxa_eb"
+    nome_saida: str = "taxa_suavizada"
 ):
     """
-    Suavização Empirical Bayes global
+    Suavização Empirical Bayes clássica
     """
     eb = Empirical_Bayes(
         gdf[casos].fillna(0).values,
-        gdf[populacao].replace(0, 1).values
+        gdf[populacao].fillna(1).values
     )
 
     gdf[nome_saida] = eb.eb
     return gdf
+
 
 def preparar_dados_bym(
     gdf,

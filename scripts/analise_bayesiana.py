@@ -1,54 +1,56 @@
 import numpy as np
+import pytensor.tensor as pt
 import pymc as pm
-import aesara.tensor as at
 import arviz as az
-
 
 def modelo_bym(
     casos: np.ndarray,
     populacao: np.ndarray,
     W,
     draws: int = 2000,
-    tune: int = 1000,
-    chains: int = 4,
-    target_accept: float = 0.9
+    tune: int = 1000
 ):
+    """
+    Modelo BYM clássico (Poisson)
+    Compatível com PyMC 5 + PyTensor
+    """
 
     n = len(casos)
+
+    # Casos esperados
     E = populacao * (casos.sum() / populacao.sum())
 
     with pm.Model() as model:
 
+        # Intercepto
         alpha = pm.Normal("alpha", mu=0, sigma=5)
 
+        # Ruído não-estruturado
         v = pm.Normal("v", mu=0, sigma=1, shape=n)
 
+        # Efeito espacial estruturado (CAR)
         tau_u = pm.Gamma("tau_u", alpha=1, beta=0.01)
 
         u = pm.CAR(
             "u",
-            mu=at.zeros(n),
+            mu=pt.zeros(n),
             W=W.sparse,
-            alpha=1,
+            alpha=1.0,
             tau=tau_u,
             shape=n
         )
 
-        log_mu = at.log(E) + alpha + u + v
-        mu = at.exp(log_mu)
+        # Modelo log-linear
+        log_mu = pt.log(E) + alpha + u + v
+        mu = pt.exp(log_mu)
 
-        pm.Poisson(
-            "casos_obs",
-            mu=mu,
-            observed=casos
-        )
+        pm.Poisson("casos_obs", mu=mu, observed=casos)
 
         trace = pm.sample(
             draws=draws,
             tune=tune,
-            chains=chains,
-            target_accept=target_accept,
-            return_inferencedata=True
+            chains=4,
+            target_accept=0.9
         )
 
     return model, trace
