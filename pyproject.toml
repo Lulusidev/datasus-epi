@@ -5,12 +5,24 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "aesara>=2.9.3",
+    "arviz>=0.23.0",
     "dbfread>=2.0.7",
+    "esda>=2.7.0",
+    "geopandas>=1.1.2",
+    "libpysal>=4.13.0",
+    "mapclassify>=2.8.1",
     "matplotlib>=3.10.8",
+    "numba>=0.57.0",
+    "numpy>=2.2.6",
     "pandas>=2.3.3",
     "pathlib>=1.0.1",
     "polars>=1.36.1",
     "pyarrow>=22.0.0",
+    "pymc>=5.25.1",
     "quadrosdesaude>=0.1.6",
+    "splot>=1.1.7",
+    "statsmodels>=0.14.6",
+    "streamlit>=1.52.2",
     "tqdm>=4.67.1",
 ]
