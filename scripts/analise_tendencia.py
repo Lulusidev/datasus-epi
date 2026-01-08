@@ -8,7 +8,6 @@ from .dicionarios import UF_CODIGO_PARA_SIGLA, UF_SIGLA_PARA_NOME
 
 import pandas as pd
 
-
 def preparar_tabela_tendencia(
     anos: list[int],
     cid: str,

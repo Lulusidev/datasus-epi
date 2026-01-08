@@ -9,7 +9,9 @@ dependencies = [
     "arviz>=0.23.0",
     "dbfread>=2.0.7",
     "esda>=2.7.0",
-    "geopandas>=1.1.2",
+    "folium>=0.20.0",
+    "geobr",
+    "geopandas>=1.0.0,<1.1",
     "libpysal>=4.13.0",
     "mapclassify>=2.8.1",
     "matplotlib>=3.10.8",
@@ -27,3 +29,6 @@ dependencies = [
     "streamlit>=1.52.2",
     "tqdm>=4.67.1",
 ]
+
+[tool.uv.sources]
+geobr = { git = "https://github.com/ipeaGIT/geobr.git", subdirectory = "python-package" }

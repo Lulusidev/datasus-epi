@@ -32,4 +32,8 @@ def garantir_parquet_sinasc(ano: int) -> Path:
 
 def abrir_sinasc(anos: list[int]) -> pl.LazyFrame:
     parquets = [garantir_parquet_sinasc(ano) for ano in anos]
-    return pl.scan_parquet(parquets)
+
+    return pl.scan_parquet(
+        parquets,
+        extra_columns="ignore"
+    )

@@ -1,8 +1,12 @@
 import polars as pl
+
 from .io import abrir_sinasc
 from .tempo import padronizar_tempo
 from .derivacoes import derivar_variaveis
 from .indicadores import indicador_malformacao
+
+from scripts.analise_espacial import juntar_geometria
+
 
 def obter_taxa_sinasc(
     anos: list[int],
@@ -51,27 +55,27 @@ def obter_taxa_sinasc(
 
     df = lf.collect()
 
+
     if retorno == "polars":
         return df
 
-    elif retorno == "pandas":
-        return df.to_pandas()
+    df_pd = df.to_pandas()
 
-    elif retorno == "geopandas":
-        import geopandas as gpd
+    if retorno == "pandas":
+        return df_pd
 
-        if "geometry" not in df.columns:
-            raise ValueError(
-                "retorno='geopandas' exige coluna 'geometry'"
-            )
-
-        return gpd.GeoDataFrame(
-            df.to_pandas(),
-            geometry="geometry",
-            crs="EPSG:4674"
-        )
-
-    else:
-        raise ValueError(
-            "retorno inválido. Use: 'polars', 'pandas' ou 'geopandas'"
-        )
+    if retorno == "geopandas":
+        # Tenta identificar a coluna espacial nos estratos para passar ao juntar_geometria
+        col_geo = None
+        for col in estratos:
+            if col in ["CODMUNRES", "MUNINFORM", "CODUFRES", "UFINFORM"]:
+                col_geo = col
+                break
+        
+        # Se não achou nenhuma conhecida, mas tem estratos, usa o primeiro (fallback)
+        if col_geo is None and estratos:
+            col_geo = estratos[0]
+        elif col_geo is None:
+            col_geo = "CODMUNRES" # Último recurso
+            
+        return juntar_geometria(df_pd, coluna_codigo=col_geo)
