@@ -1,15 +1,18 @@
 import polars as pl
 
 def padronizar_tempo(df: pl.LazyFrame) -> pl.LazyFrame:
+    """
+    Standardizes time-related variables.
+    """
     return (
         df
         .with_columns(
             pl.col("DTNASC")
             .str.strptime(pl.Date, "%d%m%Y", strict=False)
-            .alias("data_nascimento")
+            .alias("birth_date")
         )
         .with_columns(
-            pl.col("data_nascimento").dt.year().alias("ano"),
-            pl.col("data_nascimento").dt.month().alias("mes"),
+            pl.col("birth_date").dt.year().alias("year"),
+            pl.col("birth_date").dt.month().alias("month"),
         )
     )

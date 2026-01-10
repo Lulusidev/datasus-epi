@@ -4,9 +4,11 @@ def indicador_malformacao(
     df: pl.LazyFrame,
     cid: str | None = None
 ) -> pl.LazyFrame:
-
+    """
+    Creates a malformation indicator column.
+    """
     if cid is None:
-        return df.with_columns(pl.lit(0).alias("caso"))
+        return df.with_columns(pl.lit(0).alias("case"))
 
     return df.with_columns(
         (
@@ -16,5 +18,5 @@ def indicador_malformacao(
             .str.contains(f"^{cid}")
         )
         .cast(pl.Int8)
-        .alias("caso")
+        .alias("case")
     )

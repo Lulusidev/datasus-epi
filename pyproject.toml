@@ -6,15 +6,16 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "aesara>=2.9.3",
-    "arviz>=0.23.0",
     "dbfread>=2.0.7",
     "esda>=2.7.0",
     "folium>=0.20.0",
     "geobr",
     "geopandas>=1.0.0,<1.1",
+    "ipython",
     "libpysal>=4.13.0",
     "mapclassify>=2.8.1",
     "matplotlib>=3.10.8",
+    "nbformat",
     "numba>=0.57.0",
     "numpy>=2.2.6",
     "pandas>=2.3.3",
@@ -22,13 +23,23 @@ dependencies = [
     "polars>=1.36.1",
     "pyarrow>=22.0.0",
     "pymc>=5.25.1",
+    "pymannkendall",
     "pytensor>=2.31.7",
     "quadrosdesaude>=0.1.6",
     "splot>=1.1.7",
     "statsmodels>=0.14.6",
     "streamlit>=1.52.2",
     "tqdm>=4.67.1",
+    "typer>=0.21.1",
+    "uvicorn>=0.40.0",
+    "jupyter>=1.1.1", # Added jupyter to main dependencies
 ]
 
 [tool.uv.sources]
 geobr = { git = "https://github.com/ipeaGIT/geobr.git", subdirectory = "python-package" }
+
+[tool.setuptools.packages.find]
+include = ["datasus_epi*"]
+
+[dependency-groups]
+dev = [] # Removed jupyter from dev dependencies

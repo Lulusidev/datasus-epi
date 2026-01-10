@@ -1,0 +1,1 @@
+from .taxas import obter_taxa_sinasc

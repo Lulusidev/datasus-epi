@@ -1,83 +1,118 @@
-# Análise Espacial de Malformações Congênitas (SINASC)
+# Analysis of Congenital Malformations in Brazil
 
-Este projeto é uma aplicação interativa desenvolvida em Python com **Streamlit** para análise espacial de dados de malformações congênitas do **SINASC** (Sistema de Informações sobre Nascidos Vivos).
+This project provides a set of Python tools for the epidemiological analysis of data on congenital malformations from SINASC (Information System on Live Births) in Brazil.
 
-A ferramenta permite visualizar a distribuição espacial das taxas de malformações, aplicar técnicas de suavização estatística e identificar clusters espaciais significativos no Brasil.
+## Installation
 
-## 🎯 Funcionalidades
+It is recommended to use `uv` to install the dependencies from `pyproject.toml`:
 
-*   **Visualização de Dados**:
-    *   Mapas coropléticos estáticos (Matplotlib) com classificação por quartis.
-    *   Seleção dinâmica de ano (2000-2024) e CID-10 (Capítulo XVII).
-    *   Análise por Município ou Estado (UF).
-
-*   **Análise Espacial**:
-    *   **Taxa Bruta**: Cálculo da incidência por 100.000 nascidos vivos.
-    *   **Matriz de Vizinhança**: Definição de pesos espaciais via critério *Queen* (contiguidade) ou *KNN* (vizinhos mais próximos).
-    *   **Autocorrelação Global (Moran's I)**: Medida estatística para verificar se os dados são aleatórios ou agrupados espacialmente.
-    *   **Clusters Locais (LISA)**: Identificação de *hotspots* (Alto-Alto), *coldspots* (Baixo-Baixo) e outliers espaciais.
-
-*   **Suavização Estatística**:
-    *   **Empirical Bayes**: Método para correção de instabilidade das taxas em municípios com populações pequenas, reduzindo o efeito de flutuações aleatórias.
-
-## 🛠️ Tecnologias Utilizadas
-
-*   **Interface**: [Streamlit](https://streamlit.io/)
-*   **Processamento de Dados**: [Polars](https://pola.rs/) e [Pandas](https://pandas.pydata.org/)
-*   **Geoprocessamento**: [Geopandas](https://geopandas.org/) e [Geobr](https://github.com/ipeaGIT/geobr)
-*   **Estatística Espacial**: [PySAL](https://pysal.org/) (`esda`, `libpysal`)
-*   **Visualização**: Matplotlib
-*   **Get Data**: QDS(Quadros de saude)
-
-## 🚀 Como Executar
-
-### Pré-requisitos
-
-Certifique-se de ter o Python instalado (recomendado 3.10+).
-
-1.  **Clone o repositório**:
-    ```bash
-    git clone https://github.com/seu-usuario/maformacoes-python.git
-    cd maformacoes-python
-    ```
-
-2.  **Crie um ambiente virtual (opcional, mas recomendado)**:
-    ```bash
-    python -m venv .venv
-    source .venv/bin/activate  # Linux/Mac
-    # ou
-    .venv\Scripts\activate     # Windows
-    ```
-
-3.  **Instale as dependências**:
-    ```bash
-    pip install streamlit geopandas pandas polars matplotlib libpysal esda geobr
-    ```
-
-4.  **Execute a aplicação**:
-    ```bash
-    streamlit run app.py
-    ```
-
-## 📂 Estrutura do Projeto
-
-```text
-maformacoes-python/
-├── app.py                      # Aplicação principal (Streamlit)
-├── scripts/
-│   ├── analise_espacial.py     # Funções de Moran, LISA, Bayes e Mapas
-│   ├── taxas.py                # Pipeline de cálculo de taxas (Polars)
-│   ├── io.py                   # Leitura de dados (SINASC)
-│   ├── tempo.py                # Tratamento temporal
-│   ├── derivacoes.py           # Criação de variáveis auxiliares
-│   └── indicadores.py          # Lógica de filtro por CID
-└── README.md                   # Documentação do projeto
+```bash
+uv pip install -e .
 ```
 
-## 📊 Fonte de Dados
+## How to use the package
 
-Os dados utilizados provêm do **SINASC** (Ministério da Saúde/DATASUS). A aplicação espera que os dados brutos ou pré-processados estejam acessíveis através do módulo `scripts.io`.
+The `datasus_epi` package is designed to be a flexible API for use in Jupyter notebooks or other Python projects. It abstracts the download, cleaning, and standardization of SINASC data, allowing the researcher to focus on the analysis.
 
----
+### Calling the API
 
-**Nota**: Este projeto é voltado para pesquisa acadêmica e epidemiológica.
+The main entry point for the analysis is the `get_rate_sinasc` function. It orchestrates the entire pipeline, from data loading to rate aggregation.
+
+```python
+from datasus_epi.sinasc.taxas import get_rate_sinasc
+
+# Example: Calculate the rate of ALL congenital anomalies (CID Q)
+# by Region of Brazil, for the years 2015 to 2024.
+grouped_rates = get_rate_sinasc(
+    anos=list(range(2015, 2025)),
+    cid="Q",  # "Q" is the prefix for all anomalies in Ch. XVII of ICD-10
+    estratos=["REGIAO", "ano"] # Grouping by region and year
+)
+
+print(grouped_rates)
+```
+
+### Performing Analyses
+
+With the aggregated data in hand, you can use the analysis modules to investigate trends and spatial patterns.
+
+#### Trend Analysis
+
+Use the functions of the `datasus_epi.analysis.trends` module to apply statistical tests to time series.
+
+```python
+from datasus_epi.analysis.trends import linear_regression, mann_kendall
+import pandas as pd
+
+# 1. Prepare the table (pivot)
+time_series_table = grouped_rates.pivot(
+    index="REGIAO", 
+    columns="ano", 
+    values="taxa_por_100000"
+)
+
+# 2. Apply the tests
+regression_results = linear_regression(time_series_table)
+mk_results = mann_kendall(time_series_table)
+
+print("\nLinear Regression Results:")
+print(regression_results)
+
+print("\nMann-Kendall Test Results:")
+print(mk_results)
+```
+
+#### Spatial Analysis
+
+The `datasus_epi.analysis.spatial` module offers tools for spatial autocorrelation analysis.
+
+*Note: Spatial analysis is usually done in a single time period and with a finer geographical granularity (municipalities or states).*
+
+```python
+from datasus_epi.analysis.spatial import create_neighborhood_matrix, global_moran, local_lisa
+
+# Example with 2021 data by municipality
+rates_2021_mun = get_rate_sinasc(
+    anos=[2021],
+    cid="Q",
+    estratos=["CODMUNRES"],
+    retorno="geopandas" # Essential for spatial analysis
+)
+
+# Create neighborhood matrix
+w = create_neighborhood_matrix(rates_2021_mun, method="queen")
+
+# Calculate Global Moran
+moran_i, moran_p = global_moran(rates_2021_mun, "taxa_por_100000", w)
+print(f"\nGlobal Moran's I: {moran_i:.4f} (p-value: {moran_p:.4f})")
+
+# Calculate LISA
+gdf_lisa = local_lisa(rates_2021_mun, "taxa_por_100000", w)
+print("\nLISA Clusters:")
+print(gdf_lisa["lisa_cluster"].value_counts())
+
+```
+
+## Project Structure
+
+```
+datasus_epi/
+├── __init__.py
+├── sinasc/
+│   ├── __init__.py
+│   ├── load.py
+│   ├── aggregate.py
+│   ├── dictionaries.py
+│   ├── derive.py
+│   ├── indicadores.py
+│   ├── tempo.py
+│   └── taxas.py
+├── analysis/
+│   ├── __init__.py
+│   ├── trends.py
+│   └── spatial.py
+└── viz/
+    ├── __init__.py
+    ├── maps.py
+    └── trends.py
+```

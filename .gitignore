@@ -1,13 +1,31 @@
-# Python-generated files
 __pycache__/
-*.py[oc]
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+.venv/
+.pytest_cache/
+.mypy_cache/
 build/
 dist/
-wheels/
 *.egg-info
+.idea/
+.vscode/
+*.log
+*.csv
 
-# Virtual environments
-.venv
+temp_dbf
+temp_download
+temp_parquet
 
 data/
-scripts/teste
+
+GEMINI.md
+
+*.toml
+uv.lock
+
+.venv/
+
+malformacoes_python.egg-info
+docs/
