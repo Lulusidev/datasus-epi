@@ -8,7 +8,7 @@ def indicador_malformacao(
     Creates a malformation indicator column.
     """
     if cid is None:
-        return df.with_columns(pl.lit(0).alias("case"))
+        return df.with_columns(pl.lit(0).alias("casos"))
 
     return df.with_columns(
         (
@@ -18,5 +18,5 @@ def indicador_malformacao(
             .str.contains(f"^{cid}")
         )
         .cast(pl.Int8)
-        .alias("case")
+        .alias("casos")
     )

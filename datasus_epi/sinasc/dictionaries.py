@@ -20,11 +20,11 @@ DE_UF_SIGLA_PARA_NOME = {
 }
 
 DE_UF_SIGLA_PARA_REGIAO = {
-    'AC': 'North', 'AL': 'Northeast', 'AP': 'North', 'AM': 'North',
-    'BA': 'Northeast', 'CE': 'Northeast', 'DF': 'Central-West', 'ES': 'Southeast',
-    'GO': 'Central-West', 'MA': 'Northeast', 'MT': 'Central-West', 'MS': 'Central-West',
-    'MG': 'Southeast', 'PA': 'North', 'PB': 'Northeast', 'PR': 'South',
-    'PE': 'Northeast', 'PI': 'Northeast', 'RJ': 'Southeast', 'RN': 'Northeast',
-    'RS': 'South', 'RO': 'North', 'RR': 'North', 'SC': 'South',
-    'SP': 'Southeast', 'SE': 'Northeast', 'TO': 'North'
+    'AC': 'Norte', 'AL': 'Nordeste', 'AP': 'Norte', 'AM': 'Norte',
+    'BA': 'Nordeste', 'CE': 'Nordeste', 'DF': 'Centro-Oeste', 'ES': 'Sudeste',
+    'GO': 'Centro-Oeste', 'MA': 'Nordeste', 'MT': 'Centro-Oeste', 'MS': 'Centro-Oeste',
+    'MG': 'Sudeste', 'PA': 'Norte', 'PB': 'Nordeste', 'PR': 'Sul',
+    'PE': 'Nordeste', 'PI': 'Nordeste', 'RJ': 'Sudeste', 'RN': 'Nordeste',
+    'RS': 'Sul', 'RO': 'Norte', 'RR': 'Norte', 'SC': 'Sul',
+    'SP': 'Sudeste', 'SE': 'Nordeste', 'TO': 'Norte'
 }

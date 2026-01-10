@@ -3,37 +3,37 @@ import matplotlib.pyplot as plt
 
 def plotar_mapa_coropletico(
     gdf: gpd.GeoDataFrame,
-    column: str,
+    coluna: str,
     ax,
-    cmap: str = "YlOrRd",
-    legend_title: str = "Quartiles",
+    cmap: str = "Blues",
+    titulo_legenda: str = "Quartis",
     fmt: str = "{:.1f}"
 ):
     """
-    Plots a static choropleth map using quartiles.
+    Plota um mapa coroplético estático usando quartis.
 
-    Parameters
+    Parâmetros
     ----------
     gdf : geopandas.GeoDataFrame
-        GeoDataFrame containing the data and geometry.
-    column : str
-        Name of the column in the GeoDataFrame to be plotted.
+        GeoDataFrame contendo os dados e a geometria.
+    coluna : str
+        Nome da coluna no GeoDataFrame a ser plotada.
     ax : matplotlib.axes.Axes
-        Matplotlib Axes object where the map will be plotted.
-    cmap : str, default "YlOrRd"
-        Colormap to be used.
-    legend_title : str, default "Quartiles"
-        Title for the map legend.
-    fmt : str, default "{:.1f}"
-        String format for the legend labels.
+        Objeto Axes do Matplotlib onde o mapa será plotado.
+    cmap : str,
+        Mapa de cores a ser usado.
+    titulo_legenda : str, padrão "Quartis"
+        Título da legenda do mapa.
+    fmt : str, padrão "{:.1f}"
+        Formato de string para os rótulos da legenda.
     """
     gdf.plot(
-        column=column,
+        column=coluna,
         cmap=cmap,
         scheme="quantiles",
         k=4,
         legend=True,
-        legend_kwds={'loc': 'lower right', 'title': legend_title, 'fmt': fmt},
+        legend_kwds={'loc': 'lower right', 'title': titulo_legenda, 'fmt': fmt},
         edgecolor='black',
         linewidth=0.1,
         ax=ax

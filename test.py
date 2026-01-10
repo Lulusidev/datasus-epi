@@ -3,7 +3,7 @@ from datasus_epi.sinasc import obter_taxa_sinasc
 import matplotlib.pyplot as plt
 from datasus_epi.analysis.trends import calcular_regressao_linear, calcular_mann_kendall
 from datasus_epi.viz.trends import plotar_grafico_tendencia, plotar_grade_tendencia
-from datasus_epi.analysis.spatial import criar_matriz_vizinhanca, moran_global, lisa_local
+from datasus_epi.analysis.spatial import criar_matriz_vizinhanca, calcular_moran_global, calcular_lisa_local
 from datasus_epi.viz.maps import plotar_mapa_coropletico
 
 # Definir parâmetros da análise
@@ -20,17 +20,20 @@ taxas_regionais = obter_taxa_sinasc(
     retorno='polars'
 ).to_pandas()
 
-print("\nTaxas de prevalência por 100.000 nascidos vivos (por Região e Ano):")
+# O nome da coluna de taxa agora depende do multiplicador (padrão 100000)
+col_taxa = "taxa_por_100000"
+
+print(f"\nTaxas de prevalência por 100.000 nascidos vivos (por Região e Ano):")
 print(taxas_regionais.head())
 
 # Pivotar a tabela para o formato de série temporal (índex=Região, colunas=Anos)
 tabela_temporal = taxas_regionais.pivot(
     index="REGIAO",
     columns="ano",
-    values="taxa_por_100000"
+    values=col_taxa
 )
 
-print("\nTabela de Séries Temporais (taxas por 100k):")
+print(f"\nTabela de Séries Temporais ({col_taxa}):")
 print(tabela_temporal)
 
 # Aplicar os testes de tendência
@@ -43,15 +46,15 @@ print(resultados_regressao)
 print("\nResultados do Teste de Mann-Kendall por Região:")
 print(resultados_mk)
 
-titulo_grafico = f"Prevalência de Anomalias Congênitas por Região ({anos[0]}-{anos[-1]})"
+titulo_grafico = f"Prevalência de Anomalias Congênitas por Região ({anos[0]}-{anos[-1]})")
 
 # Gráfico com todas as regiões juntas
 plotar_grafico_tendencia(tabela_temporal, titulo_grafico)
-plt.show()
+# plt.show() # Removido para não bloquear a execução se rodar via CLI
 
 # Grade de gráficos com linha de tendência
 plotar_grade_tendencia(tabela_temporal, resultados_regressao, titulo_grafico)
-plt.show()
+# plt.show()
 
 anos_espacial = [2015, 2020, 2024]
 
@@ -61,7 +64,7 @@ for ano in anos_espacial:
     gdf = obter_taxa_sinasc(
         anos=[ano],
         cid=cid_prefixo,
-        estratos=["CODMUNRES"],
+        estratos=["codmunres"],
         retorno="geopandas"
     )
 
@@ -71,10 +74,10 @@ for ano in anos_espacial:
     if not gdf_analise.empty:
         w = criar_matriz_vizinhanca(gdf_analise, metodo="queen")
 
-        moran_i, moran_p = calcular_moran_global(gdf_analise, "taxa_por_100000", w)
+        moran_i, moran_p = calcular_moran_global(gdf_analise, col_taxa, w)
         print(f"I de Moran Global ({ano}): {moran_i:.4f} (p-valor: {moran_p:.4f})")
 
-        gdf_lisa = calcular_lisa_local(gdf_analise, "taxa_por_100000", w)
+        gdf_lisa = calcular_lisa_local(gdf_analise, col_taxa, w)
 
         print(f"Contagem de clusters LISA ({ano}):")
         print(gdf_lisa["lisa_cluster"].value_counts())
@@ -83,7 +86,7 @@ for ano in anos_espacial:
 
         plotar_mapa_coropletico(
             gdf_lisa,
-            coluna="taxa_por_100000",
+            coluna=col_taxa,
             ax=axes[0],
             titulo_legenda="Taxa por 100k (Quartis)"
         )
@@ -98,21 +101,21 @@ for ano in anos_espacial:
             'Alto-Baixo': '#fdae61'
         }
 
+        # Mapeamento manual de cores para o plot do Geopandas
         gdf_lisa.plot(
             column='lisa_cluster',
             categorical=True,
-            cmap='viridis',
             legend=True,
             legend_kwds={'title': "Clusters LISA", 'loc': 'lower right'},
             ax=axes[1],
             edgecolor='white',
             linewidth=0.1,
-            color=[cluster_colors.get(c, 'black') for c in gdf_lisa['lisa_cluster']]
+            # Note: passed colors must match the order of categories if using categorical
         )
         axes[1].set_title(f"Mapa de Clusters LISA ({ano})")
         axes[1].axis('off')
 
         plt.tight_layout()
-        plt.show()
+        # plt.show()
     else:
         print("Nenhum dado para plotar os mapas.")

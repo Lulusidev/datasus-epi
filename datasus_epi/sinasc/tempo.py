@@ -12,7 +12,7 @@ def padronizar_tempo(df: pl.LazyFrame) -> pl.LazyFrame:
             .alias("birth_date")
         )
         .with_columns(
-            pl.col("birth_date").dt.year().alias("year"),
-            pl.col("birth_date").dt.month().alias("month"),
+            pl.col("birth_date").dt.year().alias("ano"),
+            pl.col("birth_date").dt.month().alias("mes"),
         )
     )

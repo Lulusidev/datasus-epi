@@ -15,20 +15,20 @@ def derivar_variaveis(df: pl.LazyFrame) -> pl.LazyFrame:
         .when(age < 35).then(pl.lit("30-34"))
         .when(age < 40).then(pl.lit("35-39"))
         .otherwise(pl.lit("40+"))
-        .alias("mother_age_group"),
+        .alias("faixa_etaria_mae"),
 
         pl.col("CODMUNRES")
         .cast(pl.Utf8)
-        .alias("municipality_residence_code"),
+        .alias("codmunres"),
 
         # UF derived from the municipality
         pl.col("CODMUNRES")
         .cast(pl.Utf8)
         .str.slice(0, 2)
-        .alias("uf_residence_code"),
+        .alias("codufres"),
     ]).with_columns(
-        pl.col("uf_residence_code")
+        pl.col("codufres")
         .replace(DE_UF_CODIGO_PARA_SIGLA)
         .replace(DE_UF_SIGLA_PARA_REGIAO)
-        .alias("region")
+        .alias("REGIAO")
     )

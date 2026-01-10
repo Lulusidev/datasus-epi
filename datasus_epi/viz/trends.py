@@ -2,41 +2,41 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def plotar_grafico_tendencia(df: pd.DataFrame, title: str):
+def plotar_grafico_tendencia(df: pd.DataFrame, titulo: str):
     """
-    Plots a trend graph for multiple groups in a single figure.
+    Plota um gráfico de tendência para múltiplos grupos em uma única figura.
 
-    Parameters
+    Parâmetros
     ----------
     df : pd.DataFrame
-        DataFrame where the index represents the groups and the columns represent the years.
-    title : str
-        The title of the graph.
+        DataFrame onde o índice representa os grupos e as colunas representam os anos.
+    titulo : str
+        O título do gráfico.
     """
-    years = list(map(int, df.columns))
-    groups = df.index
+    anos = list(map(int, df.columns))
+    grupos = df.index
 
     fig, ax = plt.subplots(figsize=(8, 6))
 
-    grayscale_values = np.linspace(0.2, 0.8, len(groups))
+    grayscale_values = np.linspace(0.2, 0.8, len(grupos))
     linestyles = ['-', '--', '-.', ':']
 
-    for i, group in enumerate(groups):
+    for i, grupo in enumerate(grupos):
         color = str(grayscale_values[i])
         style = linestyles[i % len(linestyles)]
 
         ax.plot(
-            years,
-            df.loc[group],
+            anos,
+            df.loc[grupo],
             marker='o',
             linestyle=style,
             color=color,
-            label=group
+            label=grupo
         )
 
-    ax.set_xlabel("Year", fontsize=12)
-    ax.set_ylabel("Rate", fontsize=10)
-    ax.set_title(title, fontsize=14)
+    ax.set_xlabel("Ano", fontsize=12)
+    ax.set_ylabel("Taxa", fontsize=10)
+    ax.set_title(titulo, fontsize=14)
 
     ax.grid(
         True,
@@ -49,34 +49,34 @@ def plotar_grafico_tendencia(df: pd.DataFrame, title: str):
     ax.legend(
         loc='upper center',
         bbox_to_anchor=(0.5, -0.15),
-        ncol=int(len(groups) / 2),
+        ncol=int(len(grupos) / 2) if len(grupos) > 1 else 1,
         fontsize=9
     )
 
-    plt.xticks(years, rotation=45)
+    plt.xticks(anos, rotation=45)
     plt.tight_layout()
     plt.show()
 
 
-def plotar_grade_tendencia(df: pd.DataFrame, results: pd.DataFrame, title: str):
+def plotar_grade_tendencia(df: pd.DataFrame, resultados: pd.DataFrame, titulo: str):
     """
-    Plots a grid of trend graphs for multiple groups,
-    including the linear regression line.
+    Plota uma grade de gráficos de tendência para múltiplos grupos,
+    incluindo a linha de regressão linear.
 
-    Parameters
+    Parâmetros
     ----------
     df : pd.DataFrame
-        DataFrame where the index represents the groups and the columns represent the years.
-    results : pd.DataFrame
-        DataFrame containing the results of the linear regression (B0, B1, P-value, etc.).
-    title : str
-        The main title of the grid of graphs.
+        DataFrame onde o índice representa os grupos e as colunas representam os anos.
+    resultados : pd.DataFrame
+        DataFrame contendo os resultados da regressão linear (Intercepto, Inclinacao, p-valor, etc.).
+    titulo : str
+        O título principal da grade de gráficos.
     """
-    years = list(map(int, df.columns))
-    groups = df.index.tolist()
+    anos = list(map(int, df.columns))
+    grupos = df.index.tolist()
 
-    if len(groups) > 6:
-        groups = groups[:6]
+    if len(grupos) > 6:
+        grupos = grupos[:6]
 
     fig, axes = plt.subplots(
         nrows=3,
@@ -87,45 +87,45 @@ def plotar_grade_tendencia(df: pd.DataFrame, results: pd.DataFrame, title: str):
 
     axes = axes.flatten()
 
-    for i, (ax, group) in enumerate(zip(axes, groups)):
+    for i, (ax, grupo) in enumerate(zip(axes, grupos)):
         ax.plot(
-            years,
-            df.loc[group],
+            anos,
+            df.loc[grupo],
             marker='o',
             linestyle='-',
             color='0.2',
-            label='Observed'
+            label='Observado'
         )
 
-        row = results[
-            results['Group']
+        row = resultados[
+            resultados['Grupo']
             .str.replace('*', '', regex=False)
-            .str.strip() == group
+            .str.strip() == grupo
         ]
 
         if not row.empty:
-            beta0 = row["B0"].values[0]
-            beta1 = row["B1"].values[0]
+            intercepto = row["Intercepto"].values[0]
+            inclinacao = row["Inclinacao"].values[0]
 
-            trend_line = [beta0 + beta1 * year for year in years]
+            trend_line = [intercepto + inclinacao * ano for ano in anos]
 
-            p = row["P-value"].values[0]
+            p = row["p-valor"].values[0]
             p_val = f"p={p:.3f}" if p > 0.001 else "p<0.001"
 
             lr_label = (
-                f"Linear Regression ({p_val}, B1: {beta1:.3f})"
+                f"Regressão Linear ({p_val}, Inclin.: {inclinacao:.3f})"
             )
 
             ax.plot(
-                years,
+                anos,
                 trend_line,
                 linestyle='--',
                 color='0.5',
                 label=lr_label
             )
 
-        ax.set_title(group, fontsize=12, pad=5)
-        ax.set_ylabel("Rate", fontsize=10)
+        ax.set_title(grupo, fontsize=12, pad=5)
+        ax.set_ylabel("Taxa", fontsize=10)
         ax.legend(fontsize=9)
 
         ax.grid(
@@ -136,20 +136,20 @@ def plotar_grade_tendencia(df: pd.DataFrame, results: pd.DataFrame, title: str):
             alpha=0.7
         )
 
-        ax.set_xticks(years)
+        ax.set_xticks(anos)
         ax.set_xticklabels(
-            years,
+            anos,
             rotation=45,
             ha='right',
             fontsize=8
         )
 
         if i >= 4:
-            ax.set_xlabel("Year", fontsize=12)
+            ax.set_xlabel("Ano", fontsize=12)
 
-    for i in range(len(groups), len(axes)):
+    for i in range(len(grupos), len(axes)):
         fig.delaxes(axes[i])
 
-    plt.suptitle(title, fontsize=14, y=0.98)
+    plt.suptitle(titulo, fontsize=14, y=0.98)
     plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.show()
