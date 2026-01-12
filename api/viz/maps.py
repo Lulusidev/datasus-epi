@@ -7,7 +7,8 @@ def plotar_mapa_coropletico(
     ax,
     cmap: str = "Blues",
     titulo_legenda: str = "Quartis",
-    fmt: str = "{:.1f}"
+    fmt: str = "{:.1f}",
+    titulo: str | None = None
 ):
     """
     Plota um mapa coroplético estático usando quartis.
@@ -26,6 +27,8 @@ def plotar_mapa_coropletico(
         Título da legenda do mapa.
     fmt : str, padrão "{:.1f}"
         Formato de string para os rótulos da legenda.
+    titulo : str, opcional
+        Título do mapa.
     """
     gdf.plot(
         column=coluna,
@@ -38,3 +41,5 @@ def plotar_mapa_coropletico(
         linewidth=0.1,
         ax=ax
     )
+    if titulo:
+        ax.set_title(titulo)
