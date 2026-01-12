@@ -1,12 +1,12 @@
 import polars as pl
 
-from datasus_epi.sinasc.load import carregar
-from datasus_epi.sinasc.tempo import padronizar_tempo
-from datasus_epi.sinasc.indicadores import indicador_malformacao
-from datasus_epi.sinasc.derive import derivar_variaveis
-from datasus_epi.sinasc.aggregate import agregar
+from api.sinasc.load import carregar
+from api.sinasc.tempo import padronizar_tempo
+from api.sinasc.indicadores import indicador_malformacao
+from api.sinasc.derive import derivar_variaveis
+from api.sinasc.aggregate import agregar
 
-from datasus_epi.analysis.spatial import juntar_com_geometria
+from api.analysis.spatial import juntar_com_geometria
 
 
 def obter_taxa_sinasc(

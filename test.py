@@ -1,10 +1,10 @@
 import pandas as pd
-from datasus_epi.sinasc import obter_taxa_sinasc
+from api.sinasc import obter_taxa_sinasc
 import matplotlib.pyplot as plt
-from datasus_epi.analysis.trends import calcular_regressao_linear, calcular_mann_kendall
-from datasus_epi.viz.trends import plotar_grafico_tendencia, plotar_grade_tendencia
-from datasus_epi.analysis.spatial import criar_matriz_vizinhanca, calcular_moran_global, calcular_lisa_local
-from datasus_epi.viz.maps import plotar_mapa_coropletico
+from api.analysis.trends import calcular_regressao_linear, calcular_mann_kendall
+from api.viz.trends import plotar_grafico_tendencia, plotar_grade_tendencia
+from api.analysis.spatial import criar_matriz_vizinhanca, calcular_moran_global, calcular_lisa_local
+from api.viz.maps import plotar_mapa_coropletico
 
 # Definir parâmetros da análise
 anos = list(range(2015, 2025))
@@ -46,7 +46,7 @@ print(resultados_regressao)
 print("\nResultados do Teste de Mann-Kendall por Região:")
 print(resultados_mk)
 
-titulo_grafico = f"Prevalência de Anomalias Congênitas por Região ({anos[0]}-{anos[-1]})")
+titulo_grafico = f"Prevalência de Anomalias Congênitas por Região ({anos[0]}-{anos[-1]})"
 
 # Gráfico com todas as regiões juntas
 plotar_grafico_tendencia(tabela_temporal, titulo_grafico)

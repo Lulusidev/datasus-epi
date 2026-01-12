@@ -39,7 +39,7 @@ dependencies = [
 geobr = { git = "https://github.com/ipeaGIT/geobr.git", subdirectory = "python-package" }
 
 [tool.setuptools.packages.find]
-include = ["datasus_epi*"]
+include = ["api*"]
 
 [dependency-groups]
 dev = [] # Removed jupyter from dev dependencies
