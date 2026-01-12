@@ -97,12 +97,19 @@ def suavizar_taxa(
 
 def obter_geometria_municipios(
     ano: int = 2022,
+    uf: str = None,
     simplificado: bool = True
 ) -> gpd.GeoDataFrame:
     """
     Baixa (ou carrega do cache) a malha municipal do IBGE.
+    
+    uf: Sigla (ex: 'PI', 'CE') ou código do estado (ex: 22). 
+        Se None, baixa todo o Brasil.
     """
+    code = uf if uf else "all"
+    
     gdf = geobr.read_municipality(
+        code_muni=code,
         year=ano,
         simplified=simplificado
     )
@@ -115,7 +122,8 @@ def obter_geometria_municipios(
 def juntar_com_geometria(
     df,
     coluna_codigo: str = "codmunres",
-    ano_malha: int = 2022
+    ano_malha: int = 2022,
+    uf: str = None
 ):
     """
     Junta a tabela agregada do SINASC com a malha municipal ou estadual.
@@ -128,6 +136,13 @@ def juntar_com_geometria(
     if coluna_codigo == "codufres":
         gdf_shape = geobr.read_state(year=ano_malha, simplified=True)
         col_geo = "code_state"
+        
+        # Se houver filtro de UF
+        if uf:
+            if str(uf).isdigit():
+                gdf_shape = gdf_shape[gdf_shape["code_state"] == float(uf)]
+            else:
+                gdf_shape = gdf_shape[gdf_shape["abbrev_state"] == str(uf).upper()]
         
         # Padronização
         gdf_shape[col_geo] = gdf_shape[col_geo].astype(str)
@@ -142,7 +157,7 @@ def juntar_com_geometria(
         return gdf
 
     # Lógica para Municípios (Padrão)
-    gdf_shape = obter_geometria_municipios(ano=ano_malha)
+    gdf_shape = obter_geometria_municipios(ano=ano_malha, uf=uf)
 
     # Padroniza para 6 dígitos para garantir o join (SINASC costuma ser 6, Geobr 7)
     df[coluna_codigo] = df[coluna_codigo].astype(str)
